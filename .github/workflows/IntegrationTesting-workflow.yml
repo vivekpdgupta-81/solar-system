@@ -1,0 +1,22 @@
+name: IntegrationTesting workflow
+on: 
+  push:
+  workflow_dispatch:
+jobs:
+    Adding_env_variable:
+        runs-on: ubuntu-latest
+        steps:
+            - name: checkout repo
+              uses: actions/checkout@v4
+              
+            - name: Add env variable
+              run: |
+                echo "PROJECT='AI project'" >> "$GITHUB_ENV"
+                echo "NAME='Sri satya'" >> "$GITHUB_ENV"
+            
+            - name: Read env variable
+              run: |
+                chmod +x script.sh
+                ./script.sh
+                # echo ${{ env.PROJECT }}
+                # echo ${{ env.NAME }}

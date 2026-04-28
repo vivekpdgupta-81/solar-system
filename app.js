@@ -1,3 +1,4 @@
+require('dotenv').config();
 const path = require('path');
 const express = require('express');
 const OS = require('os');
@@ -11,9 +12,10 @@ app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, '/')));
 app.use(cors())
 
-mongoose.connect(process.env.MONGO_URI, {
-    user: process.env.MONGO_USERNAME,
-    pass: process.env.MONGO_PASSWORD,
+mongoose.connect('mongodb+srv://supercluster.d83jj.mongodb.net/superData', {
+    user: 'superuser',
+    pass: 'SuperPassword',
+    // process.env.MONGO_PASSWORD
     useNewUrlParser: true,
     useUnifiedTopology: true
 }, function(err) {

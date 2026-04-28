@@ -1,0 +1,13 @@
+name: Backend workflow
+on:
+    push:
+      paths:
+        - 'backend/**'
+jobs:
+    backend-testing-job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: backend-testing
+              run: echo "Backend workflow is running"
+
+    

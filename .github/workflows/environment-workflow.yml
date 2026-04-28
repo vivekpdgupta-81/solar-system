@@ -1,0 +1,37 @@
+name: Environment workflow
+on:
+ push:
+
+jobs:
+
+  Intro:
+    runs-on: ubuntu-latest
+    outputs: 
+      name: "Jai Hanuman"
+    steps:
+      - name: into step
+        run: echo "Hello world"
+
+  Development_job:
+    uses: ./.github/workflows/reusable-workflow.yml
+    with:
+      PROJECT: "Development and QA project.."
+      VERSION: 1
+    secrets:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    
+  Production_job:
+    uses: ./.github/workflows/reusable-workflow.yml
+    secrets: 
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    with:
+      PROJECT: "Production project."
+  
+  testing_job:
+    needs: [Production_job]
+    runs-on: ubuntu-latest
+    steps:
+      - name: testing step
+        run: echo "url - ${{ needs.Production_job.outputs.URL }}"
+    
+      

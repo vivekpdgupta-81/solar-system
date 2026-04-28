@@ -1,0 +1,30 @@
+name: Reusable Workflow
+on:
+    workflow_call:
+      inputs:
+        PROJECT:
+            required: true
+            type: string
+        VERSION:
+          required: false
+          type: number
+      secrets:
+        AWS_REGION:
+          required: true
+      outputs:
+        URL:
+          value: ${{ jobs.intro_step.outputs.url }}
+
+jobs:
+  intro_step:
+    runs-on: ubuntu-latest
+    outputs:
+      url: "http://localhost:8080"
+    steps:
+      - name: First_step
+        run: echo "This is ${{ inputs.PROJECT }} of version - ${{ inputs.VERSION }}"
+      - name: Secrets accessing
+        run: echo ${{ secrets.AWS_REGION }}
+      - name: Accesing outputs 
+        run: echo "name - ${{ needs.Intro.outputs.name }}"
+    

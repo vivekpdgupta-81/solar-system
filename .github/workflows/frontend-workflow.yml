@@ -1,0 +1,11 @@
+name: Frontend workflow
+on:
+    push:
+      paths:
+        - 'frontend/**'
+jobs:
+    frontend-job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: frontend testing 
+              run: echo "Frontend workflow is running"

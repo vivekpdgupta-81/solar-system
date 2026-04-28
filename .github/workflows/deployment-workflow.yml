@@ -1,0 +1,225 @@
+name: Deployment_workflow
+on:
+    push:
+    workflow_dispatch:
+jobs:
+    dev-deployment:
+        runs-on: ubuntu-latest
+        if: contains(github.ref , 'feature/')
+        environment:
+          name: Development
+          url: https://${{ steps.set-ingress-hostname.outputs.INGRESS_HOSTNAME }}
+        outputs:
+          INGRESS_HOSTNAME: ${{ steps.set-ingress-hostname.outputs.INGRESS_HOSTNAME }}
+        steps:
+            - name: Checkout Repo.
+              uses: actions/checkout@v4
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v6.1.0
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Install kubectl CLI
+              id: install-kubectl
+              uses: Azure/setup-kubectl@v5.0.0
+              with:
+                version: 'v1.35.0'
+
+            - name: Set kubeConfig
+              uses: Azure/k8s-set-context@v5.0.0
+              with:
+                method: kubeconfig
+                kubeconfig: ${{ secrets.KUBECONFIG }}
+            
+            - name: Check kubectl installition
+              if: false 
+              run: |
+                  kubectl version 
+                  echo "___________________________________________________________________"
+                  kubectl get nodes
+                  kubectl get deploy
+                  kubectl get pods
+                  docker ps
+                  docker images
+
+            - name: Saving Ingress IP as github env variable
+              id: set-ingress-hostname
+              run: |
+                  INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+                  echo "Plain hostname: $INGRESS_IP"
+                  ENCODED_IP=$(echo -n "$INGRESS_IP" | base64 -w 0)
+                  echo "INGRESS_HOSTNAME=$ENCODED_IP" >> "$GITHUB_OUTPUT"
+
+            
+            - name: Replace values in manifest files
+              uses: cschleiden/replace-tokens@v1
+              with:
+                tokenPrefix: '_{_'
+                tokenSuffix: '_}_'
+                files: '["kubernetes/development/*.yaml"]'
+              env:
+                NAMESPACE: ${{ vars.NAMESPACE}}
+                REPLICAS: ${{ vars.REPLICAS }}
+                IMAGE: ${{ vars.DOCKER_USERNAME}}/solar-system:latest
+                DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME}}
+                # INGRESS_IP: ${{ env.INGRESS_IP }}
+
+            - name: Check manifest files after replacing placeholders
+              if: false
+              run: cat kubernetes/development/*.yaml
+
+            - name: Create namespace.
+              run: |
+                kubectl apply -f kubernetes/development/namespace.yaml
+                kubectl get ns
+
+            - name: Create MongoDB secrets
+              run: |
+                  kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
+                  --from-literal=MONGO_URI=${{ vars.MONGO_URI }} \
+                  --from-literal=MONGO_USERNAME=${{ vars.MONGO_USERNAME }} \
+                  --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+                  --save-config \
+                  --dry-run=client \
+                  -o yaml | kubectl apply -f -
+            
+            - name: Deploy to k8s cluster
+              run: kubectl apply -f kubernetes/development
+
+            - name: Validate the deployments resources
+              run: kubectl get all -n ${{ vars.NAMESPACE }}
+
+            - name: Check App status
+              if: false
+              run: curl ${{ env.INGRESS_IP }}/live
+
+    dev-Integration_testing:
+      runs-on: ubuntu-latest
+      if: contains(github.ref , 'feature/')
+      needs: [dev-deployment]
+      steps:
+        - name: Validating website status
+          env:
+            URL: ${{ needs.dev-deployment.outputs.INGRESS_HOSTNAME }}
+          run: |
+            echo $URL
+            DECODED_URL=$(echo "$URL" | base64 -d )
+            echo $DECODED_URL
+            curl http://${DECODED_URL}/live
+    
+    prod-deployment:
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        environment:
+          name: Production
+          url: https://${{ steps.set-ingress-hostname.outputs.INGRESS_HOSTNAME }}
+        outputs:
+          INGRESS_HOSTNAME: ${{ steps.set-ingress-hostname.outputs.INGRESS_HOSTNAME }}
+        steps:
+            - name: Checkout Repo.
+              uses: actions/checkout@v4
+
+            - name: print Github ref
+              run: echo ${{ github.ref }}
+
+            - name: Configure AWS Credentials
+              uses: aws-actions/configure-aws-credentials@v6.1.0
+              with:
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws-region: ${{ secrets.AWS_REGION }}
+
+            - name: Install kubectl CLI
+              id: install-kubectl
+              uses: Azure/setup-kubectl@v5.0.0
+              with:
+                version: 'v1.35.0'
+
+            - name: Set kubeConfig
+              uses: Azure/k8s-set-context@v5.0.0
+              with:
+                method: kubeconfig
+                kubeconfig: ${{ secrets.KUBECONFIG }}
+            
+            - name: Check kubectl installition
+              if: false 
+              run: |
+                  kubectl version 
+                  echo "___________________________________________________________________"
+                  kubectl get nodes
+                  kubectl get deploy
+                  kubectl get pods
+                  docker ps
+                  docker images
+
+            - name: Saving Ingress IP as github env variable
+              id: set-ingress-hostname
+              run: |
+                  INGRESS_IP=$(kubectl -n ingress-nginx get services ingress-nginx-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+                  echo "Plain hostname: $INGRESS_IP"
+                  ENCODED_IP=$(echo -n "$INGRESS_IP" | base64 -w 0)
+                  echo "INGRESS_HOSTNAME=$ENCODED_IP" >> "$GITHUB_OUTPUT"
+
+            
+            - name: Replace values in manifest files
+              uses: cschleiden/replace-tokens@v1
+              with:
+                tokenPrefix: '_{_'
+                tokenSuffix: '_}_'
+                files: '["kubernetes/production/*.yaml"]'
+              env:
+                NAMESPACE: ${{ vars.NAMESPACE}}
+                REPLICAS: ${{ vars.REPLICAS }}
+                IMAGE: ${{ vars.DOCKER_USERNAME}}/solar-system:latest
+                DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME}}
+                # INGRESS_IP: ${{ env.INGRESS_IP }}
+
+            - name: Check manifest files after replacing placeholders
+              if: true
+              run: cat kubernetes/production/*.yaml
+
+            - name: Create namespace.
+              run: |
+                kubectl apply -f kubernetes/production/namespace.yaml
+                kubectl get ns
+
+            - name: Create MongoDB secrets
+              run: |
+                  kubectl -n ${{ vars.NAMESPACE }} create secret generic mongo-db-creds \
+                  --from-literal=MONGO_URI=${{ vars.MONGO_URI }} \
+                  --from-literal=MONGO_USERNAME=${{ vars.MONGO_USERNAME }} \
+                  --from-literal=MONGO_PASSWORD=${{ secrets.MONGO_PASSWORD }} \
+                  --save-config \
+                  --dry-run=client \
+                  -o yaml | kubectl apply -f -
+            
+            - name: Deploy to k8s cluster
+              run: kubectl apply -f kubernetes/production
+
+            - name: Validate the deployments resources
+              run: kubectl get all -n ${{ vars.NAMESPACE }}
+
+            - name: Check App status
+              if: false
+              run: curl ${{ env.INGRESS_IP }}/live
+              
+    prod-Integration_testing:
+      runs-on: ubuntu-latest
+      if: github.ref == 'refs/heads/main'
+      needs: [prod-deployment]
+      steps:
+        - name: Validating website status
+          env:
+            URL: ${{ needs.prod-deployment.outputs.INGRESS_HOSTNAME }}
+          run: |
+            echo $URL
+            DECODED_URL=$(echo "$URL" | base64 -d )
+            echo $DECODED_URL
+            curl http://${DECODED_URL}/live
+
+            
+
+             

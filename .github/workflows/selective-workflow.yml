@@ -1,0 +1,46 @@
+name: Selective workflow
+on:
+  push
+jobs:
+    change:
+        runs-on: ubuntu-latest
+        outputs:
+            root-change: ${{ steps.change.outputs.root }}
+            backend-change: ${{ steps.change.outputs.backend }}
+            images-change: ${{ steps.change.outputs.images}}
+        steps:
+            - name: Checkout repo
+              uses: actions/checkout@v6
+              
+            - name: Track changes
+              id: change
+              uses: dorny/paths-filter@v3
+              with:
+                filters: |
+                    root:
+                        - '/**'
+                    backend:
+                        - 'backend/**'
+                    images:
+                        - 'images/**'
+
+    run-tests:
+        runs-on: ubuntu-latest
+        needs: [change]
+        steps: 
+            - name: Checkout repo
+              uses: actions/checkout@v6
+            - name: detect backend change 
+              if:  needs.change.outputs.backend-change == 'true'
+              run: |
+                echo "Backend folder changed"
+            - name: detect images change
+              if: needs.change.outputs.images-change == 'true'
+              run: |
+                echo "Image folder changed"
+            - name: detect Root folder
+              if: needs.change.outputs.root-change == 'true'
+              run: |
+                echo "Root folder changed"
+                
+
