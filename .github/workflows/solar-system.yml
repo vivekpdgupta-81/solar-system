@@ -14,21 +14,33 @@ env:
 jobs:
     unit-testing:
         name: Unit Testing
-        runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            node_version: [18,20]
+            os: [ubuntu-latest,macos-latest]
+        runs-on: ${{ matrix.os }}
         steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
 
         - name: Setup NodeJS Version # need to install this as we are using npm
-          uses: actions/setup-node@v4
+          uses: actions/setup-node@v4  # action to install node
           with:
-            node-version: 20
+            node-version: ${{matrix.node_version }}
+        - name: Cache NPM dependenices
+          uses: actions/cache@v4
+          with:
+            path: node_modules
+            key:  ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json')}}
+            # when the  package-lock.json file changed, it will modify the hash value there by creating 
+            # a new key for new cache
+
     
         - name: Install Dependencies
           run: npm install
     
         - name: Unit Testing
-          id: unit-testing-step
+          id: unit-testing-step #can be used to track the outcome for next step using steps context
           run: npm test
           
         - name: Archive Test Result
@@ -49,7 +61,12 @@ jobs:
         - name: Setup NodeJS Version
           uses: actions/setup-node@v4
           with:
-            node-version: 20
+            node-version: 18
+        - name: Cache NPM dependenices
+          uses: actions/cache@v4
+          with:
+            path: node_modules
+            key:  ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json')}}
         - name: Install Dependencies
           run: npm install
 
