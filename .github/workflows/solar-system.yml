@@ -11,7 +11,7 @@ env:
     MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
 
-    
+
 
 jobs:
     unit-testing:
@@ -82,8 +82,20 @@ jobs:
             name: Code-Coverage_Result # name to the artifact zip file name
             path: coverage
             retention-days: 5
+  
+    docker:
+      name: Containerization
+      needs: [unit-testing,code-coverage]
+      runs-on: ubuntu-latest
+      
+      steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
 
-    
-          
+        - name: Dockerhub login
+          uses: docker/login-action@v2.2.0
+          with:
+            username: ${{ vars.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
         
