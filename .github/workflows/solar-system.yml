@@ -159,12 +159,7 @@ jobs:
       steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
-
-        - name: Install kubectl CLI
-          uses: azure/setup-kubectl@v4
-          with:
-            version: 'v1.26.0'
-
+          
         - name: Fetch Kubernetes cluster details
           run: |
             kubectl version --client
