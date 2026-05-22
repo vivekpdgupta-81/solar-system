@@ -178,7 +178,7 @@ jobs:
           with:
             tokenPrefix: '_{_'
             tokenSuffix: '_}_'
-            files: '["kubernetes/development/*.yml"]'
+            files: '["kubernetes/development/*.yaml"]'
           env:
             NAMESPACE: ${{ vars.NAMESPACE }}
             REPLICAS: ${{ vars.REPLICAS }}
@@ -188,7 +188,8 @@ jobs:
         - name: check files
           shell: powershell
           run: |
-           Get-ChildItem -Recurse kubernetes
+           Get-Content kubernetes/development/*.yaml
+           
 
 
                
