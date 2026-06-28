@@ -23,10 +23,10 @@ jobs:
         - name: Install Dependencies
           run: npm install          # Installtions of nde.js dependencies
     
-        - name: Unit Testing
+        - name: Unit Testing        # testing nodejs with npm test
           run: npm test
           
-        - name: Archive Test Result
+        - name: Archive Test Result  # Uploading artifacts
           uses: actions/upload-artifact@v3
           with:
             name: Mocha-Test-Result
