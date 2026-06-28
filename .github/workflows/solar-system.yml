@@ -6,7 +6,10 @@ on:
     branches:
       - main
       - 'feature/*'
-    
+env:
+    MONGO_URI: mongodb://localhost:27017/solarsystem
+    MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
 jobs:
     unit-testing:
         name: Unit Testing
