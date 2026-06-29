@@ -7,7 +7,7 @@ on:
       - main
       - 'feature/*'
 env:
-    MONGO_URI: mongodb://localhost:27017/solarsystem
+    MONGO_URI: mongodb+srv://cluster0.b8qyhhx.mongodb.net/solarsystem
     MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
 jobs:
