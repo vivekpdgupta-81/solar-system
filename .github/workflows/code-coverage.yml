@@ -1,0 +1,64 @@
+## This is to test different nodejs versions across different OS platform - Ex - Diff apps testing
+## across different OS paltform and also it covers unit testing and code coverage
+
+name: Solar System Workflow with OS & node.js matrix
+
+on: 
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+env:
+    MONGO_URI: mongodb+srv://cluster0.b8qyhhx.mongodb.net/solarsystem
+    MONGO_USERNAME: ${{ vars.MONGO_USERNAME }}
+    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD}}
+jobs:
+    unit-testing:
+        name: Unit Testing
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Setup NodeJS Version
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20        # Installtions of node.js version 
+    
+        - name: Install Dependencies
+          run: npm install          # Installtions of nde.js dependencies
+    
+        - name: Unit Testing        # testing nodejs with npm test
+          run: npm test
+          
+        - name: Archive Test Result  # Uploading artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: Mocha-Test-Result
+            path: test-results.xml
+            
+    Code-Coverage:
+        name: code coverage
+        runs-on: ubuntu-latest
+        steps:
+        - name: Checkout Repository
+          uses: actions/checkout@v4
+
+        - name: Setup NodeJS Version
+          uses: actions/setup-node@v3
+          with:
+            node-version: 20        # Installtions of node.js version 
+    
+        - name: Install Dependencies
+          run: npm install          # Installtions of nde.js dependencies
+    
+        - name: Unit Testing        # Run code coverage
+          run: npm run coverage
+          
+        - name: Archive Test Result  # Uploading artifacts
+          uses: actions/upload-artifact@v4
+          with:
+            name: Code-ceoverage-results
+            path: coverage
+            retention-days: 5
