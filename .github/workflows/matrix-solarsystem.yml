@@ -1,4 +1,7 @@
-name: Solar System Workflow
+## This is to test different nodejs versions across different OS platform - Ex - Diff apps testing
+## across different OS paltform
+
+name: Solar System Workflow with OS & node.js matrix
 
 on: 
   workflow_dispatch:
@@ -13,15 +16,22 @@ env:
 jobs:
     unit-testing:
         name: Unit Testing
-        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                nodejs_version: [20, 22, 24]
+                Operating_system: [ubuntu-latest, macos-latest]
+                exclude:
+                    - nodejs_version: 20
+                      operating_system: macos-latest
+        runs-on: ${{matrix.operating_system}}
         steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
 
-        - name: Setup NodeJS Version
+        - name: Setup NodeJS Version - ${{matrix.nodejs_version}}
           uses: actions/setup-node@v3
           with:
-            node-version: 20        # Installtions of node.js version 
+            node-version: ${{matrix.nodejs_version}}        # Installtions of node.js version 
     
         - name: Install Dependencies
           run: npm install          # Installtions of nde.js dependencies
