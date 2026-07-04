@@ -1,0 +1,89 @@
+# If expression functions testing
+name: If & ID Expression testing
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'feature/*'
+
+env:
+  MONGO_URI: mongodb+srv:/*cluster0.b8qyhhx.mongodb.net/solar*ystem
+  MONGO_USERNAME: ${{ vars.M*NGO_USERNAME }}
+  MONGO_PASSWORD: *{{ secrets.MONGO_PASSWORD }}
+
+jobs*
+  unit-testing:
+    name: Unit Te*ting
+    runs-on: ubuntu-latest
+
+ *  steps:
+      - name: Checkout Re*ository
+        uses: actions/chec*out@v4
+
+      - name: Setup NodeJS*Version
+        uses: actions/setu*-node@v3
+        with:
+          n*de-version: 20
+
+      - name: Inst*ll Dependencies
+        run: npm i*stall
+
+      - name: Unit Testing
+*       id: nodejs-unit-testing-ste*
+        continue-on-error: true
+ *      run: npm test
+
+      - name:*Check files after test
+        if:*always()
+        run: |
+          *wd
+          ls -la
+          find*. -name "test-results.xml"
+
+      * name: Archive Test Result
+       *if: always()
+        uses: actions*upload-artifact@v4
+        with:
+ *        name: Mocha-Test-Result
+  *       path: test-results.xml
+    *     if-no-files-found: warn
+
+  Co*e-Coverage:
+    name: Code Coverag*
+    runs-on: ubuntu-latest
+
+    s*eps:
+      - name: Checkout Reposi*ory
+        uses: actions/checkout*v4
+
+      - name: Setup NodeJS Ver*ion
+        uses: actions/setup-no*e@v3
+        with:
+          node-*ersion: 20
+
+      - name: Install *ependencies
+        run: npm insta*l
+
+      - name: Code Coverage tes*s
+        id: code-coverage-step
+ *      continue-on-error: true
+    *   run: npm run coverage
+
+      - *ame: Check coverage folder
+       *if: always()
+        run: |
+      *   pwd
+          ls -la
+          *ind . -type d -name "coverage"
+
+  *   - name: Archive Code Coverage R*sult
+        if: always()
+        *ses: actions/upload-artifact@v4
+  *     with:
+          name: Code-co*erage-results
+          path: cove*age
+          retention-days: 5
+  *       if-no-files-found: warn
+```*
