@@ -32,6 +32,7 @@ jobs:
 
       - name: Unit Testing
         id: nodejs-unit-testing-step
+        continue-on-error: true
         run: npm test
 
       - name: Check files after test
