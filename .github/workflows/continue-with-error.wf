@@ -23,7 +23,7 @@ jobs:
         - name: Setup NodeJS Version
           uses: actions/setup-node@v3
           with:
-            node-version: 20        # Installtions of node.js version 
+            node-version: 22        # Installtions of node.js version 
     
         - name: Install Dependencies
           run: npm install          # Installtions of nde.js dependencies
@@ -47,7 +47,7 @@ jobs:
         - name: Setup NodeJS Version
           uses: actions/setup-node@v3
           with:
-            node-version: 20        # Installtions of node.js version 
+            node-version: 22        # Installtions of node.js version 
     
         - name: Install Dependencies
           run: npm install          # Installtions of nde.js dependencies
