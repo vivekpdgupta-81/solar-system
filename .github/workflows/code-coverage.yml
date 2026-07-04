@@ -32,9 +32,10 @@ jobs:
     
         - name: Unit Testing        # testing nodejs with npm test
           id: nodejs-unit-testing-step   # This is to add an ID which will be used in next step as reference
+          continue-on-error: true
           run: npm test
           
-        - name: Archive Test Result  # Uploading artifacts irrespective above unit testing results
+        - name: check after file test  # Uploading artifacts irrespective above unit testing results
           # Even the previous step is failing, the below if command will execute only if its succesfull
           # Since success() is mentioned as the function as part of the expression
           # if: success() && (steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success')
@@ -43,7 +44,19 @@ jobs:
           # Added always() to check further and irrespective of failure or success
           # if: failure()
           if: always()
+          run: |
+            pwd
+            ls -la
+            find . -name "test-results.xml"
+
+        - name: Archive Test Result     
+          if: always()
           uses: actions/upload-artifact@v4
+          with:
+            name: Mocha-Test-Result
+            path: test-results.xml
+            if-no-files-found: warn
+
           with:
             name: Mocha-Test-Result
             path: test-results.xml
