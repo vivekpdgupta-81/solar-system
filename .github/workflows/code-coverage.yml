@@ -1,7 +1,8 @@
-## This is to test different nodejs versions across different OS platform - Ex - Diff apps testing
-## across different OS paltform and also it covers unit testing and code coverage
+## Below is the testing of if and id refering over the unit testing, its to show bypassing
+## unit testing outome and still run the artifactory creation as part of the next step
 
-name: Solar System Workflow with OS & node.js matrix
+
+name: If & ID Expression testing
 
 on: 
   workflow_dispatch:
@@ -30,9 +31,11 @@ jobs:
           run: npm install          # Installtions of nde.js dependencies
     
         - name: Unit Testing        # testing nodejs with npm test
+          id: nodejs-unit-testing-step   # This is to add an ID which will be used in next step as reference
           run: npm test
           
-        - name: Archive Test Result  # Uploading artifacts
+        - name: Archive Test Result  # Uploading artifacts irrespective above unit testing results
+          if: steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success'
           uses: actions/upload-artifact@v4
           with:
             name: Mocha-Test-Result
