@@ -24,33 +24,21 @@ jobs:
       - name: Setup NodeJS Version
         uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: 'npm'
+          node-version: 22
 
       - name: Install Dependencies
         run: npm install
 
       - name: Unit Testing
-        id: nodejs-unit-testing-step
-        continue-on-error: true
-        env:
-          MOCHA_FILE: ./test-results.xml 
+        id: nodejs-unit-testing-step 
         run: npm test
 
-      - name: Check files after test
-        if: always()
-        run: |
-          pwd
-          ls -la
-          find . -name "test-results.xml"
-
       - name: Archive Test Result
-        if: always()
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: Mocha-Test-Result
           path: test-results.xml
-          if-no-files-found: warn
 
   code-coverage:
     name: Code Coverage
