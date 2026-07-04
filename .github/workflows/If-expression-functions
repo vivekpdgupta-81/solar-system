@@ -33,6 +33,8 @@ jobs:
       - name: Unit Testing
         id: nodejs-unit-testing-step
         continue-on-error: true
+        env:
+          MOCHA_FILE: ./test-results.xml 
         run: npm test
 
       - name: Check files after test
