@@ -16,7 +16,6 @@ mongoose.connect(process.env.MONGO_URI, {
     pass: process.env.MONGO_PASSWORD,
     useNewUrlParser: true,
     useUnifiedTopology: true
-    #tls: true
 }, function(err) {
     if (err) {
         console.log("error!! " + err)
