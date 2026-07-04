@@ -40,7 +40,9 @@ jobs:
           # if: success() && (steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success')
           # Above will still fail becasue it only consider success as the parameter & thus to consider 
           # failure as well, so lets add failure() and see
-          if: failure()
+          # Added always() to check further and irrespective of failure or success
+          # if: failure()
+          if: always()
           uses: actions/upload-artifact@v4
           with:
             name: Mocha-Test-Result
