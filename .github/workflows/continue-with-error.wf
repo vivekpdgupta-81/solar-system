@@ -53,7 +53,7 @@ jobs:
           run: npm install          # Installtions of nde.js dependencies
     
         - name: Code Coverage tests       # Run code coverage
-          Continue-on-error: true
+          Continue-on-error: true         # code coverage mark it as true to ignore the error
           run: npm run coverage
           
         - name: Archive Test Result  # Uploading artifacts
