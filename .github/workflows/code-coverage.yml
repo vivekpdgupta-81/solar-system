@@ -37,7 +37,10 @@ jobs:
         - name: Archive Test Result  # Uploading artifacts irrespective above unit testing results
           # Even the previous step is failing, the below if command will execute only if its succesfull
           # Since success() is mentioned as the function as part of the expression
-          if: success() && (steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success')
+          # if: success() && (steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success')
+          # Above will still fail becasue it only consider success as the parameter & thus to consider 
+          # failure as well, so lets add failure() and see
+          if: failure() && (steps.nodejs-unit-testing-step == 'failure' || steps.nodejs-unit-testing-step.outcome == 'success')
           uses: actions/upload-artifact@v4
           with:
             name: Mocha-Test-Result
