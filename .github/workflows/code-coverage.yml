@@ -56,10 +56,6 @@ jobs:
             name: Mocha-Test-Result
             path: test-results.xml
             if-no-files-found: warn
-
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
             
     Code-Coverage:
         name: code coverage
