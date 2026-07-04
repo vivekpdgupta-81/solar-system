@@ -14,8 +14,9 @@ app.use(cors())
 mongoose.connect(process.env.MONGO_URI, {
     user: process.env.MONGO_USERNAME,
     pass: process.env.MONGO_PASSWORD,
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    #useNewUrlParser: true,
+    #useUnifiedTopology: true
+    tls: true
 }, function(err) {
     if (err) {
         console.log("error!! " + err)
