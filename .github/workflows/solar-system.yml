@@ -39,8 +39,8 @@ jobs:
             path: ~/.npm
             key: ${{ runner.os }}-node-${{ matrix.nodejs_version }}-${{ hashFiles('package-lock.json') }}
             restore-keys: |
-            ${{ runner.os }}-node-${{ matrix.nodejs_version }}-
-            ${{ runner.os }}-node-
+              ${{ runner.os }}-node-${{ matrix.nodejs_version }}-
+              ${{ runner.os }}-node-
 
         - name: Install Dependencies
           run: npm install
