@@ -30,7 +30,7 @@ jobs:
 
         - name: Debug env
           run: |
-          echo "MONGO_URI starts with: ${MONGO_URI:0:20}"
+           echo "MONGO_URI starts with: ${MONGO_URI:0:20}"
     
         - name: Unit Testing
           run: npm test
