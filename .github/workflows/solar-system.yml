@@ -76,8 +76,8 @@ jobs:
             path: ~/.npm
             key: ${{ runner.os }}-node-20-${{ hashFiles('package-lock.json') }}
             restore-keys: |
-            ${{ runner.os }}-node-20-
-            ${{ runner.os }}-node-
+              ${{ runner.os }}-node-20-
+              ${{ runner.os }}-node-
 
         - name: Install Dependencies
           run: npm install
