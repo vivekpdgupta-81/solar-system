@@ -32,7 +32,16 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: ${{ matrix.nodejs_version }}
-    
+   
+        - name: Cache NPM Dependencies
+          uses: actions/cache@v4
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-${{ matrix.nodejs_version }}-${{ hashFiles('package-lock.json') }}
+            restore-keys: |
+            ${{ runner.os }}-node-${{ matrix.nodejs_version }}-
+            ${{ runner.os }}-node-
+
         - name: Install Dependencies
           run: npm install
 
@@ -60,6 +69,15 @@ jobs:
           uses: actions/setup-node@v4
           with:
             node-version: 20
+
+        - name: Cache NPM Dependencies
+          uses: actions/cache@v4
+          with:
+            path: ~/.npm
+            key: ${{ runner.os }}-node-20-${{ hashFiles('package-lock.json') }}
+            restore-keys: |
+            ${{ runner.os }}-node-20-
+            ${{ runner.os }}-node-
 
         - name: Install Dependencies
           run: npm install
