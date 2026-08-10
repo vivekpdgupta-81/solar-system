@@ -111,6 +111,7 @@ jobs:
         with:
           context: .
           push: false
+          load: true
           tags: ${{vars.DOCKER_USERNAME}}/solar-system:${{github.sha}}
 
       - name: Trivy Vulnerability Scan    #Scanning images and save report as artifact
@@ -144,4 +145,7 @@ jobs:
          echo $IP
          echo Testing Image URL using wget
          wget -q -O - 127.0.0.1:3000/live | grep live
+
+      - name: Docker Push           # push only after scan and test pass
+        run: docker push ${{ vars.DOCKER_USERNAME }}/solar-system:${{ github.sha }}
 
