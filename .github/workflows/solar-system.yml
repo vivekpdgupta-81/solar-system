@@ -113,6 +113,23 @@ jobs:
           push: false
           tags: ${{vars.DOCKER_USERNAME}}/solar-system:${{github.sha}}
 
+      - name: Trivy Vulnerability Scan    #Scanning images and save report as artifact
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: 0             # report only, never fail
+          ignore-unfixed: true
+          output: trivy-report.txt  # save report as file
+
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: Trivy-Scan-Report
+          path: trivy-report.txt
+          retention-days: 5
+
       - name: Docker Image testing
         run: |
          docker images
