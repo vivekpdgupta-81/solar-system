@@ -105,3 +105,19 @@ jobs:
         with:
           username: ${{vars.DOCKER_USERNAME}}
           password: ${{secrets.DOCKER_TOKEN}}
+
+      - name: Docker Build & Testing
+        run: |
+         docker images
+         docker run --name solar-system-app -d \
+          -p 3000:300 \
+          -e MONGO_URI: $MONGO_URI \
+          -e MONGO_USERNAME: $MONGO_USERNAME \
+          -e MONGO_PASSWORD: $MONGO_PASSWORD \
+          ${{env.DOCKER_USERNAME}}/solar-system:${{github.sha}}
+
+         export IP=$(docker inspect -f '{{range .Netwroksettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+         echo $IP
+         echo Testing Image URL using wget
+         wget -q -o - 127.0.0.1:3000/live | grep live
+
